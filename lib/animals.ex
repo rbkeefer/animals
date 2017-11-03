@@ -33,7 +33,7 @@ defmodule Animals do
         [Enum.at(animal_list, 0), Enum.at(animal_list, 1), get_guess(Enum.at(animal_list, 2)), Enum.at(animal_list, 3)]
       end
     else
-      # Go down 'no' path since it didn't match
+      # Go down 'no' path since the description didn't match
       [Enum.at(animal_list, 0), Enum.at(animal_list, 1), Enum.at(animal_list, 2), get_guess(Enum.at(animal_list, 3))]
     end
   end
