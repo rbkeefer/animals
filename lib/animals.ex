@@ -14,28 +14,40 @@ defmodule Animals do
     IO.gets "#{prompt}"
   end
 
-  def get_guess([]) do
+  def guess([]) do
     animal = (IO.gets "I'm sorry I don't know. What animal were you thinking of? ") |> String.trim
     description = (IO.gets "Great thanks. What is a question that is unique to this animal? ") |> String.trim
+    IO.puts "\nThank you. I like to learn these things.\n"
 
     ["Is it a #{animal}? ", "#{description}? ", [], []]
   end
 
-  def get_guess(animal_list) do
+  def guess(animal_list) do
     prompt_answer = try_prompt(Enum.at(animal_list, 1))    # Try description
     # prompt_answer = "no"
     if "yes" == String.trim(prompt_answer) do
       prompt_answer = try_prompt(List.first(animal_list))  # Try anaimal name
       if "yes" == String.trim(prompt_answer) do
-        IO.puts "I knew it!"
+        IO.puts "\nI knew it!"
       else
         # Go down 'yes' path since it does match description
-        [Enum.at(animal_list, 0), Enum.at(animal_list, 1), get_guess(Enum.at(animal_list, 2)), Enum.at(animal_list, 3)]
+        [Enum.at(animal_list, 0), Enum.at(animal_list, 1), guess(Enum.at(animal_list, 2)), Enum.at(animal_list, 3)]
       end
     else
       # Go down 'no' path since the description didn't match
-      [Enum.at(animal_list, 0), Enum.at(animal_list, 1), Enum.at(animal_list, 2), get_guess(Enum.at(animal_list, 3))]
+      [Enum.at(animal_list, 0), Enum.at(animal_list, 1), Enum.at(animal_list, 2), guess(Enum.at(animal_list, 3))]
     end
+  end
+
+  def start(animal_list) do
+    IO.puts "\n\n\n\nThink of an animal and I'll try to figure it out by asking you questions.\n\n"
+    IO.gets "Ready? "
+    IO.puts "\n"
+    start(guess(animal_list))
+  end
+
+  def main(args \\ []) do
+    start([])
   end
 
 end

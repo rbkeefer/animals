@@ -4,10 +4,15 @@ defmodule Animals.Mixfile do
   def project do
     [app: :animals,
      version: "0.1.0",
+     escript: escript(),
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
+  end
+
+  def escript do
+    [main_module: Animals]
   end
 
   # Configuration for the OTP application
