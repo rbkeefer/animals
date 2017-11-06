@@ -10,23 +10,24 @@ defmodule Animals do
 
   """
 
-  def try_prompt(prompt) do
+  def prompt(prompt) do
     IO.gets "#{prompt}"
   end
 
   def guess([]) do
     animal = (IO.gets "I'm sorry I don't know. What animal were you thinking of? ") |> String.trim
     description = (IO.gets "Great thanks. What is a question that is unique to this animal? ") |> String.trim
+
     IO.puts "\nThank you. I like to learn these things.\n"
 
     ["Is it a #{animal}? ", "#{description}? ", [], []]
   end
 
   def guess(animal_list) do
-    prompt_answer = try_prompt(Enum.at(animal_list, 1))    # Try description
+    prompt_answer = prompt(Enum.at(animal_list, 1))    # Try description
     # prompt_answer = "no"
     if "yes" == String.trim(prompt_answer) do
-      prompt_answer = try_prompt(List.first(animal_list))  # Try anaimal name
+      prompt_answer = prompt(List.first(animal_list))  # Try anaimal name
       if "yes" == String.trim(prompt_answer) do
         IO.puts "\nI knew it!"
       else
