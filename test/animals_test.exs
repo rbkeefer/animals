@@ -26,4 +26,14 @@ defmodule AnimalsTest do
     assert :ok = Animals.guess(["Is it a frog? ", "Is it green? ", [], []], FakeIO)
   end
 
+  test "Save list to file" do
+    animal_list = ["Is it a frog? ", "Is it green? ",
+                   ["Is it a lizard? ", "Is it thin? ", [], []],
+                   ["Is it a cat? ", "Does it ignore you? ", [], []]]
+    Animals.save_to_file(animal_list)
+    {:ok, animal_list} = File.read("animals.txt")
+
+    assert "[\"Is it a frog? \", \"Is it green? \", [\"Is it a lizard? \", \"Is it thin? \", [], []], [\"Is it a cat? \", \"Does it ignore you? \", [], []]]" == animal_list
+  end
+
 end

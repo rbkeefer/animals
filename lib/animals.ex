@@ -18,6 +18,22 @@ defmodule Animals do
   @instructions "\n\n\n\nThink of an animal and I'll try to figure it out by asking you questions.\n\n"
   @ready "Ready? "
 
+  def convert_to_string([]) do
+    "[]"
+  end
+
+  def convert_to_string(animal_list) do
+    "[\"#{Enum.at(animal_list, 0)}\", \"#{Enum.at(animal_list, 1)}\", #{convert_to_string(Enum.at(animal_list, 2))}, #{convert_to_string(Enum.at(animal_list, 3))}]"
+  end
+
+  def save_to_file(animal_list) do
+    File.write("animals.txt", convert_to_string(animal_list))
+  end
+
+  def read_from_file(animal_list) do
+
+  end
+
   def prompt(message, io \\ IO) do
     io.gets "#{message}"
   end
@@ -54,7 +70,11 @@ defmodule Animals do
 
   def start(animal_list) do
     response(@instructions)
-    prompt(@ready)
+    prompt_answer = prompt(@ready)
+    if "save" == String.trim(prompt_answer) do
+      save_to_file(animal_list)
+    end
+
     start(guess(animal_list, IO))
   end
 
