@@ -30,8 +30,28 @@ defmodule Animals do
     File.write("animals.txt", convert_to_string(animal_list))
   end
 
-  def read_from_file(animal_list) do
+  def convert_to_list(animal_list_string) do
+IO.puts("Initial List: #{animal_list_string}")
+    [animal_name, description, remainder] = String.split(animal_list_string, ~r{,}, parts: 3)
+    remainder = String.trim_leading(remainder, ",")
+IO.puts("Name: #{animal_name}  .Desc: #{description}   .Rem: #{remainder}")
+    cond do
+      String.starts_with?(remainder, "[],[]],") ->
+        [[String.trim_leading(animal_name, "["), description, [], []], [convert_to_list(String.trim_leading(remainder, "[],[]],"))]]
+      String.starts_with?(remainder, "[],[]]") ->
+        [String.trim_leading(animal_name, "["), description, [], []]
+      String.starts_with?(remainder, "[],[") ->
+        [String.trim_leading(animal_name, "["), description, [], [convert_to_list(String.trim_leading(remainder, "[],"))]]
+      Regex.match?(~r/[a-zA-Z]/, remainder) ->
+        [String.trim_leading(animal_name, "["), description] ++ [convert_to_list(remainder)]
+      true ->
+        [String.trim_leading(animal_name, "["), description, [], []]
+    end
+  end
 
+  def read_from_file() do
+    {:ok, animal_list_string} = File.read("animals.txt")
+    convert_to_list(animal_list_string)
   end
 
   def prompt(message, io \\ IO) do
