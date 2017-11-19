@@ -10,6 +10,8 @@ defmodule Animals do
 
   """
 
+  require Poison
+
   # List of prompts and responses used to interact with the user
   @dont_know "I'm sorry I don't know. What animal were you thinking of? "
   @get_unique_question "Great thanks. What is a question that is unique to this animal? "
@@ -18,44 +20,17 @@ defmodule Animals do
   @instructions "\n\n\n\nThink of an animal and I'll try to figure it out by asking you questions.\n\n"
   @ready "Ready? "
 
-  def convert_to_string([]) do
-    "[]"
-  end
-
-  def convert_to_string(animal_list) do
-    "[\"#{Enum.at(animal_list, 0)}\", \"#{Enum.at(animal_list, 1)}\", #{convert_to_string(Enum.at(animal_list, 2))}, #{convert_to_string(Enum.at(animal_list, 3))}]"
-  end
-
   def save_to_file(animal_list) do
-    File.write("animals.txt", convert_to_string(animal_list))
-  end
-
-  def convert_to_list(animal_list_string) do
-IO.puts("Initial List: #{animal_list_string}")
-    [animal_name, description, remainder] = String.split(animal_list_string, ~r{,}, parts: 3)
-    remainder = String.trim_leading(remainder, ",")
-IO.puts("Name: #{animal_name}  .Desc: #{description}   .Rem: #{remainder}")
-    cond do
-      String.starts_with?(remainder, "[],[]],") ->
-        [[String.trim_leading(animal_name, "["), description, [], []], [convert_to_list(String.trim_leading(remainder, "[],[]],"))]]
-      String.starts_with?(remainder, "[],[]]") ->
-        [String.trim_leading(animal_name, "["), description, [], []]
-      String.starts_with?(remainder, "[],[") ->
-        [String.trim_leading(animal_name, "["), description, [], [convert_to_list(String.trim_leading(remainder, "[],"))]]
-      Regex.match?(~r/[a-zA-Z]/, remainder) ->
-        [String.trim_leading(animal_name, "["), description] ++ [convert_to_list(remainder)]
-      true ->
-        [String.trim_leading(animal_name, "["), description, [], []]
-    end
+    File.write("animals.txt", Poison.encode!(animal_list))
   end
 
   def read_from_file() do
     {:ok, animal_list_string} = File.read("animals.txt")
-    convert_to_list(animal_list_string)
+    Poison.decode!(animal_list_string)
   end
 
   def prompt(message, io \\ IO) do
-    io.gets "#{message}"
+    (io.gets "#{message}") |> String.trim
   end
 
   def response(message, io \\ IO) do
@@ -63,36 +38,49 @@ IO.puts("Name: #{animal_name}  .Desc: #{description}   .Rem: #{remainder}")
   end
 
   def guess([], io) do
-    animal = (prompt(@dont_know, io)) |> String.trim
-    description = (prompt(@get_unique_question, io)) |> String.trim
+    # Create a new node at the bottom of the tree
+    animal = prompt(@dont_know, io)
+    description = prompt(@get_unique_question, io)
 
     response(@thanks, io)
 
     ["Is it a #{animal}? ", "#{description}? ", [], []]
   end
 
-  def guess(animal_list, io) do
-    prompt_answer = prompt(Enum.at(animal_list, 1), io)    # Try description
-    # prompt_answer = "no"
-    if "yes" == String.trim(prompt_answer) do
-      prompt_answer = prompt(List.first(animal_list), io)  # Try anaimal name
-      if "yes" == String.trim(prompt_answer) do
-        response(@knew_it, io)
-      else
-        # Go down 'yes' path since it does match description
-        [Enum.at(animal_list, 0), Enum.at(animal_list, 1), guess(Enum.at(animal_list, 2), io), Enum.at(animal_list, 3)]
-      end
-    else
-      # Go down 'no' path since the description didn't match
-      [Enum.at(animal_list, 0), Enum.at(animal_list, 1), Enum.at(animal_list, 2), guess(Enum.at(animal_list, 3), io)]
-    end
+  def guess(answer_list=[answer, question, yes_node, no_node], io) do
+    prompt_answer = prompt(question, io)    # Try description
+    process_question(prompt_answer, answer_list, io)
+  end
+
+  def process_question("yes", answer_list=[answer, question, yes_node, no_node], io) do
+    prompt_answer = prompt(answer, io)  # Try anaimal name
+    process_answer(prompt_answer, answer_list, io)
+  end
+
+  def process_question("no", [answer, question, yes_node, no_node], io) do
+    # Go down 'no' path since the description didn't match
+    [answer, question, yes_node, guess(no_node, io)]
+  end
+
+  def process_answer("yes", answer_list=[answer, question, yes_node, no_node], io) do
+    # Found the right animal
+    response(@knew_it, io)
+    answer_list
+  end
+
+  def process_answer("no", [answer, question, yes_node, no_node], io) do
+    # Go down 'yes' path since it does match description, but is not the right animal
+    [answer, question, guess(yes_node, io), no_node]
   end
 
   def start(animal_list) do
     response(@instructions)
     prompt_answer = prompt(@ready)
-    if "save" == String.trim(prompt_answer) do
+    if "save" == prompt_answer do
       save_to_file(animal_list)
+    end
+    if "load" == prompt_answer do
+      animal_list = read_from_file()
     end
 
     start(guess(animal_list, IO))

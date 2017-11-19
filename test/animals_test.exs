@@ -23,44 +23,25 @@ defmodule AnimalsTest do
   end
 
   test "Add second animal to list" do
-    assert :ok = Animals.guess(["Is it a frog? ", "Is it green? ", [], []], FakeIO)
+    animal_list = ["Is it a frog? ", "Is it green? ", [], []]
+    assert animal_list == Animals.guess(["Is it a frog? ", "Is it green? ", [], []], FakeIO)
   end
 
   test "Save list to file" do
-    animal_list = ["Is it a frog? ", "Is it green? ",
-                   ["Is it a lizard? ", "Is it thin? ", [], []],
-                   ["Is it a cat? ", "Does it ignore you? ", [], []]]
+    animal_list = ["Is it a frog? ","Is it green? ",
+                   ["Is it a lizard? ","Is it thin? ", [], []],
+                   ["Is it a cat? ","Does it ignore you? ", [], []]]
     Animals.save_to_file(animal_list)
     {:ok, animal_list} = File.read("animals.txt")
 
-    assert "[\"Is it a frog? \", \"Is it green? \", [\"Is it a lizard? \", \"Is it thin? \", [], []], [\"Is it a cat? \", \"Does it ignore you? \", [], []]]" == animal_list
+    assert "[\"Is it a frog? \",\"Is it green? \",[\"Is it a lizard? \",\"Is it thin? \",[],[]],[\"Is it a cat? \",\"Does it ignore you? \",[],[]]]" == animal_list
   end
 
-  test "Convert one animal" do
-    assert ["Is it a lizard? " ,"Is it thin? " , [], []] ==
-      Animals.convert_to_list("[Is it a lizard? ,Is it thin? ,[],[]]")
+  test "Read list from file" do
+    test_list = ["Is it a frog? ","Is it green? ",
+                   ["Is it a lizard? ","Is it thin? ",[],[]],
+                   ["Is it a cat? ","Does it ignore you? ",[],[]]]
+    assert test_list == Animals.read_from_file()
   end
-
-  # This test currently fails. I need to work out a regex that will break each
-  # four-tuple up for me, and then recurse on those. Or I need to work out
-  # how to append a list to another list without joining them.
-  #
-  # test "Convert list of animals" do
-  #   test_list = ["Is it a frog?","Is it green?",
-  #                  ["Is it a lizard?","Is it thin?",[],[]],
-  #                  ["Is it a cat?","Does it ignore you?",[],[]]]
-  #   given_string = "[Is it a frog?,Is it green?,[Is it a lizard?,Is it thin?,[],[]],[Is it a cat?,Does it ignore you?,[],[]]]"
-  #
-  #   assert test_list == Animals.convert_to_list(given_string)
-  # end
-
-  # This test currently fails for the same reason that the test above fails.
-  #
-  # test "Read list from file" do
-  #   test_list = ["Is it a frog?","Is it green?",
-  #                  ["Is it a lizard?","Is it thin?",[],[]],
-  #                  ["Is it a cat?","Does it ignore you?",[],[]]]
-  #   assert test_list == Animals.read_from_file()
-  # end
 
 end

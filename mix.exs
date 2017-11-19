@@ -34,6 +34,7 @@ defmodule Animals.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
+      {:poison, "~> 3.1"},
       {:mix_test_watch, "~> 0.5.0"}
     ]
   end
