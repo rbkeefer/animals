@@ -25,8 +25,9 @@ defmodule BugsTest do
 
   describe "know of one animal" do
     test "a winged fly" do
-      {output, data} = Bug.guess(["Is it winged?", ["Is it a fly?", [], []], []], "y")
-      {output, data} = Bug.guess(["Is it winged?", ["Is it a fly?", [], []], []], "y")
+      data = ["Is it winged?", ["Is it a fly?", [], []], []]
+      {output, data} = Bug.guess(data, "y")
+      {output, data} = Bug.guess(data, "y")
 
       assert String.contains?(output, "Is it winged?")
       assert String.contains?(output, "Is it a fly?")
