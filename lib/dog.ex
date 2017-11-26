@@ -1,5 +1,11 @@
 defmodule Dog do
-  def try_to_guess(_ata, _nput, output \\ [])
+  # Main look with all input arguments defaulted
+  def try_to_guess() do
+    try_to_guess(
+      [],
+      fn() -> IO.gets(:stdio, ": ") end,
+      [])
+  end
 
   # Process a leaf node which is always the possible answer
   def try_to_guess(data = [_, [], []], input, output) do
