@@ -1,58 +1,70 @@
 defmodule BugsTest do
   use ExUnit.Case
 
-  description "no data" do
-    test "teach that a fly is winged" do
-      {_utput, data} = Bug.guess([], "fly")
-      {output, _ata} = Bug.guess(data, "Is it winged?")
+  describe "keep trying" do
+    data = Bugs.try_to_guess(
+      fn(data, input) -> {data ++ ["value"], input} end,
+      [],
+      fn() -> "some input" end,
+      2)
 
-      assert String.contains?(output, "I am sorry I don't know. What animal was it?")
-      assert String.contains?(output, "What would be a good question to identify this animal?")
+    assert data == ["value", "value"]
+
+  end
+
+  describe "no data" do
+    test "teach that a fly is winged" do
+      {output, data} = Bugs.guess([], "Is it winged?")
+      assert String.contains?(output, "I am sorry I don't know. What bug was it?")
+      assert String.contains?(output, "What would be a good question to identify this bug?")
+
+      {output, _ata} = Bugs.guess(data, "Is it winged?")
       assert String.contains?(output, "Great thanks.")
     end
 
-    test "if the animal is an empty string. ask again" do
-      {output, data} = Bug.guess([], "")
-      {output, data} = Bug.guess(data, "fly")
-      {output, data} = Bug.guess(data, "Is it winged?")
+    test "if the bug is an empty string. ask again" do
+      {output, data} = Bugs.guess([], "")
+      {output, data} = Bugs.guess(data, "fly")
+      {output, data} = Bugs.guess(data, "Is it winged?")
 
-      assert String.contains?(output, "I am sorry I don't know. What animal was it?")
-      assert String.contains?(output, "I didn't understand that. What animal was it?")
-      assert String.contains?(output, "What would be a good question to identify this animal?")
+      assert String.contains?(output, "I am sorry I don't know. What bug was it?")
+      assert String.contains?(output, "I didn't understand that. What bug was it?")
+      assert String.contains?(output, "What would be a good question to identify this bug?")
       assert String.contains?(output, "Great thanks.")
     end
   end
 
-  describe "know of one animal" do
+  describe "know of one bug" do
     test "a winged fly" do
       data = ["Is it winged?", ["Is it a fly?", [], []], []]
-      {output, data} = Bug.guess(data, "y")
-      {output, data} = Bug.guess(data, "y")
 
+      {output, data} = Bugs.guess(data, "y")
       assert String.contains?(output, "Is it winged?")
+
+      {output, data} = Bugs.guess(data, "y")
       assert String.contains?(output, "Is it a fly?")
       assert String.contains?(output, "I knew it.")
     end
 
     test "its not winged" do
       data = ["Is it winged?", ["Is it a fly?", [], []], []]
-      {output, data} = Bug.guess(data, "n")
-      {output, data} = Bug.guess(data, "ant")
-      {output, data} = Bug.guess(data, "Does it have six legs?")
+      {output, data} = Bugs.guess(data, "n")
+      {output, data} = Bugs.guess(data, "ant")
+      {output, data} = Bugs.guess(data, "Does it have six legs?")
 
       assert String.contains?(output, "Is it winged?")
-      assert String.contains?(output, "I am sorry I don't know. What animal was it?")
-      assert String.contains?(output, "What would be a good question to identify this animal?")
+      assert String.contains?(output, "I am sorry I don't know. What bug was it?")
+      assert String.contains?(output, "What would be a good question to identify this bug?")
       assert String.contains?(output, "Great thanks.")
     end
   end
 
-  describe "know of two animal" do
+  describe "know of two bug" do
     test "a winged fly" do
       data = ["Is it winged?", ["Is it a fly", [], []], ["Does it have six leg?", ["Is it an ant?", [], []]]]
-      {output, data} = Bug.guess(data, "y")
-      {output, data} = Bug.guess(data, "y")
-      {output, data} = Bug.guess(data, "y")
+      {output, data} = Bugs.guess(data, "y")
+      {output, data} = Bugs.guess(data, "y")
+      {output, data} = Bugs.guess(data, "y")
 
       assert String.contains?(output, "Is it winged?")
       assert String.contains?(output, "Is it a fly?")
@@ -61,9 +73,9 @@ defmodule BugsTest do
 
     test "a six legged ant" do
       data = ["Is it winged?", ["Is it a fly", [], []], ["Does it have six leg?", ["Is it an ant?", [], []]]]
-      {output, data} = Bug.guess(data, "y")
-      {output, data} = Bug.guess(data, "n")
-      {output, data} = Bug.guess(data, "y")
+      {output, data} = Bugs.guess(data, "y")
+      {output, data} = Bugs.guess(data, "n")
+      {output, data} = Bugs.guess(data, "y")
 
       assert String.contains?(output, "Is it winged?")
       assert String.contains?(output, "Does it have six legs?")
@@ -72,7 +84,7 @@ defmodule BugsTest do
     end
   end
 
-  describe "learning a new animal" do
+  describe "learning a new bug" do
     test "learn about beatles" do
       data = [
         "Is it winged?", 
@@ -91,14 +103,14 @@ defmodule BugsTest do
         ]
       ]
 
-      {_utput, data} = Bug.guess(data, "y")
-      {_utput, data} = Bug.guess(data, "n")
-      {_utput, data} = Bug.guess(data, "y")
-      {output, _ata} = Bug.guess(data, "y")
+      {_utput, data} = Bugs.guess(data, "y")
+      {_utput, data} = Bugs.guess(data, "n")
+      {_utput, data} = Bugs.guess(data, "y")
+      {output, _ata} = Bugs.guess(data, "y")
 
       assert String.contains?(output, "Is it winged?")
       assert String.contains?(output, "Is it hairy?")
-      assert String.contains?(output, "Is it a pack animal?")
+      assert String.contains?(output, "Is it a pack bug?")
       assert String.contains?(output, "Is it a llama?")
       assert String.contains?(output, "I knew it.")
     end
