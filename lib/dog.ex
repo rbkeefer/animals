@@ -13,6 +13,7 @@ defmodule Dog do
     output
   end
 
+  # Loop through guesses
   def try_to_guess(data, input, output) do
     {data, input, output} = guess(data, input, output)
     try_to_guess(data, input, output)
@@ -30,19 +31,19 @@ defmodule Dog do
     write("#{message}", output)
   end
 
-  def choose([_, [], []], "y", output) do
+  defp choose([_, [], []], "y", output) do
     {[], write("I knew it.", output)}
   end
-  def choose([_, [], []], "n", output) do
+  defp choose([_, [], []], "n", output) do
     {[], write("I am sorry I don't know. What dog was it?", output)}
   end
-  def choose([_, yes_node, _], "y", output) do
+  defp choose([_, yes_node, _], "y", output) do
     {yes_node, output}
   end
-  def choose([_, _, no_node], "n", output) do
+  defp choose([_, _, no_node], "n", output) do
     {no_node, output}
   end
-  def choose(data, response, output) do
+  defp choose(data, response, output) do
     {data, write("Can't say '#{response}'. Must answer 'y' or 'n'.", output)}
   end
 
