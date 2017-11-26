@@ -9,8 +9,8 @@ defmodule Dog do
 
   # Process a leaf node which is always the possible answer
   def try_to_guess(data = [_, [], []], input, output) do
-    {_ata, _nput, output} = guess(data, input, output)
-    output
+    {data, _nput, output} = guess(data, input, output)
+    {data, output}
   end
 
   # Loop through guesses
@@ -20,34 +20,47 @@ defmodule Dog do
   end
 
   def guess(data = [question, _, _], input, output) do
-    output = ask(question, output)
+    {choice, output} = prompt(question, input, output)
 
-    {data, output} = choose(data, input.(), output)
+    {data, output} = choose(data, choice, input, output)
 
     {data, input, output}
   end
 
-  defp ask(message, output) do
-    write("#{message}", output)
+  defp choose([_, [], []], "y", _nput, output) do
+    {[], write(output, "I knew it.")}
   end
+  defp choose(data = [_, [], []], "n", input, output) do
+    output = write(output, "I am sorry I don't know.")
 
-  defp choose([_, [], []], "y", output) do
-    {[], write("I knew it.", output)}
+    learn(data, input, output)
   end
-  defp choose([_, [], []], "n", output) do
-    {[], write("I am sorry I don't know. What dog was it?", output)}
-  end
-  defp choose([_, yes_node, _], "y", output) do
+  defp choose([_, yes_node, _], "y", _nput, output) do
     {yes_node, output}
   end
-  defp choose([_, _, no_node], "n", output) do
+  defp choose([_, _, no_node], "n", _nput, output) do
     {no_node, output}
   end
-  defp choose(data, response, output) do
-    {data, write("Can't say '#{response}'. Must answer 'y' or 'n'.", output)}
+  defp choose(data, response, _nput, output) do
+    {data, write(output, "Can't say '#{response}'. Must answer 'y' or 'n'.")}
   end
 
-  defp write(message, output) do
+  defp learn([question, _es_node, no_node], input, output) do
+    {new_answer, output}   = prompt("What was it?", input, output)
+    {new_question, output} = prompt("What would be a good question to identify this dog?", input, output)
+
+    data = [question, no_node, [new_question, [new_answer, [], []], []]]
+    {data, output}
+  end
+
+  defp prompt(question, input, output) do
+    output = write(output, question)
+    answer = input.()
+    output = write(output, "Answer: #{answer}")
+    {answer, output}
+  end
+
+  defp write(output, message) do
     IO.puts message
     output ++ [message]
   end
