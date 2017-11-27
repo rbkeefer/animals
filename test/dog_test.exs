@@ -38,6 +38,14 @@ defmodule DogTest do
       assert Enum.member?(output, "Is it a Collie?")
       assert Enum.member?(output, "Can't say 'INVALID'. Must answer 'y' or 'n'.")
     end
+
+    test "valid answer with a CR on the end" do
+      data = ["Is it a Collie?", [], []]
+      {_ata, _nput, output} = Dog.guess(data, fn() -> "y\n" end, [])
+
+      assert Enum.member?(output, "Is it a Collie?")
+      assert Enum.member?(output, "I knew it."), "Was not in #{inspect output}"
+    end
   end
 
   describe "two question" do

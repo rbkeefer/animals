@@ -55,7 +55,7 @@ defmodule Dog do
 
   defp prompt(question, input, output) do
     output = write(output, question)
-    answer = input.()
+    answer = String.trim(input.())
     output = write(output, "Answer: #{answer}")
     {answer, output}
   end
