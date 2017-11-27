@@ -98,7 +98,9 @@ defmodule DogTest do
     end
 
     test "no initial data" do
-      {_ata, output} = Dog.try_to_guess(["", [], []], fn() -> "n" end, [])
+      {data, output} = Dog.try_to_guess(["empty", [], []], fn() -> "n" end, [])
+
+      assert ["n", ["n", [], []], []] == data
 
       assert Enum.member?(output, "I am sorry I don't know."), "Was not in #{inspect output}"
     end

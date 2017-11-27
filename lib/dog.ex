@@ -2,7 +2,7 @@ defmodule Dog do
   # Main look with all input arguments defaulted
   def try_to_guess() do
     try_to_guess(
-      ["", [], []],
+      ["empty", [], []],
       fn() -> IO.gets(:stdio, ": ") end,
       [])
   end
@@ -19,6 +19,12 @@ defmodule Dog do
     try_to_guess(data, input, output)
   end
 
+  # The first loop must skip the choice and just create a new 
+  # root node representing the first entry in the data.
+  def guess(data = ["empty", _, _], input, output) do
+    {["empty", [], data], output} = choose(data, "n", input, output)
+    {data, input, output}
+  end
   def guess(data = [question, _, _], input, output) do
     {choice, output} = prompt(question, input, output)
 
