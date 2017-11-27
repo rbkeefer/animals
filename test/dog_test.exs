@@ -88,6 +88,13 @@ defmodule DogTest do
       assert Enum.member?(output, "d")
       assert Enum.member?(output, "I am sorry I don't know.")
     end
+
+    test "no initial data" do
+      {_ata, output} = Dog.try_to_guess(["", [], []], fn() -> "n" end, [])
+
+      assert Enum.member?(output, "I am sorry I don't know."), "Was not in #{inspect output}"
+    end
+    
   end
 
   describe "learn a new dog" do

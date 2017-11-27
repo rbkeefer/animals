@@ -2,7 +2,7 @@ defmodule Dog do
   # Main look with all input arguments defaulted
   def try_to_guess() do
     try_to_guess(
-      [],
+      ["", [], []],
       fn() -> IO.gets(:stdio, ": ") end,
       [])
   end
