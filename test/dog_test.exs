@@ -109,11 +109,10 @@ defmodule DogTest do
 
   describe "learn a new dog" do
     test "add second dog", context do
+      input_func = expect_input(context.pid, ["n", "Is it a Beagle?","Short haired?"])
+
       data = ["Is it a hound?", [], []]
-
-      setup_answers(context.pid, ["n", "Is it a Beagle?","Short haired?"])
-
-      {data, output} = Dog.try_to_guess(data, fn() -> DogTest.next_answer(context.pid) end, [])
+      {data, output} = Dog.try_to_guess(data, input_func, [])
 
       assert ["Is it a hound?", [], ["Short haired?", ["Is it a Beagle?", [], []], []]] == data
 
@@ -121,12 +120,12 @@ defmodule DogTest do
     end
   end
 
-  def setup_answers(pid, answers) do
+  def expect_input(pid, answers) do
     Agent.update(pid, fn _tate -> answers end)
-  end
 
-  def next_answer(pid) do
-    Agent.get_and_update(pid, fn([next_answer|answers]) -> {next_answer, answers} end) 
+    fn() -> 
+      Agent.get_and_update(pid, fn([next_answer|answers]) -> {next_answer, answers} end) 
+    end
   end
 end
 
