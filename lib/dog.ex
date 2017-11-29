@@ -1,45 +1,46 @@
 defmodule Dog do
   # Main look with all input arguments defaulted
   def try_to_guess() do
-    try_to_guess(
-      ["empty", [], []],
-      fn() -> IO.gets(:stdio, ": ") end,
-      [])
+    root_node = ["empty", [], []]
+    input_func = fn() -> IO.gets(:stdio, ": ") end
+    output = []
+
+    try_to_guess(root_node, input_func, output)
   end
 
   # Process a leaf node which is always the possible answer
-  def try_to_guess(data = [_, [], []], input, output) do
-    {data, _nput, output} = guess(data, input, output)
-    {data, output}
+  def try_to_guess(node = [_, [], []], input, output) do
+    {next_node, _nput, output} = guess(node, input, output)
+    {next_node, output}
   end
 
   # Loop through guesses
-  def try_to_guess(data, input, output) do
-    {data, input, output} = guess(data, input, output)
-    try_to_guess(data, input, output)
+  def try_to_guess(node, input, output) do
+    {next_node, input, output} = guess(node, input, output)
+    try_to_guess(next_node, input, output)
   end
 
   # The first loop must skip the choice and just create a new 
   # root node representing the first entry in the data.
-  def guess(data = ["empty", _, _], input, output) do
-    {["empty", [], data], output} = choose(data, "n", input, output)
-    {data, input, output}
+  def guess(node = ["empty", _, _], input, output) do
+    {["empty", [], next_node], output} = choose(node, "n", input, output)
+    {next_node, input, output}
   end
-  def guess(data = [question, _, _], input, output) do
+  def guess(node = [question, _, _], input, output) do
     {choice, output} = prompt(question, input, output)
 
-    {data, output} = choose(data, choice, input, output)
+    {next_node, output} = choose(node, choice, input, output)
 
-    {data, input, output}
+    {next_node, input, output}
   end
 
   defp choose([_, [], []], "y", _nput, output) do
     {[], write(output, "I knew it.")}
   end
-  defp choose(data = [_, [], []], "n", input, output) do
+  defp choose(node = [_, [], []], "n", input, output) do
     output = write(output, "I am sorry I don't know.")
 
-    learn(data, input, output)
+    learn(node, input, output)
   end
   defp choose([_, yes_node, _], "y", _nput, output) do
     {yes_node, output}
@@ -47,16 +48,16 @@ defmodule Dog do
   defp choose([_, _, no_node], "n", _nput, output) do
     {no_node, output}
   end
-  defp choose(data, response, _nput, output) do
-    {data, write(output, "Can't say '#{response}'. Must answer 'y' or 'n'.")}
+  defp choose(node, response, _nput, output) do
+    {node, write(output, "Can't say '#{response}'. Must answer 'y' or 'n'.")}
   end
 
   defp learn([question, _es_node, no_node], input, output) do
     {new_answer, output}   = prompt("What was it?", input, output)
     {new_question, output} = prompt("What would be a good question to identify this dog?", input, output)
 
-    data = [question, no_node, [new_question, [new_answer, [], []], []]]
-    {data, output}
+    learned_node = [question, no_node, [new_question, [new_answer, [], []], []]]
+    {learned_node, output}
   end
 
   defp prompt(question, input, output) do
