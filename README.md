@@ -8,13 +8,17 @@ Elixir-based solution to the classic 'AI' problem of learning about animals thro
 ## To Play Animals
 Animals is an inner-node implementation of the solution.
 
-* mix escript.build
-* ./animals
+```shell
+$ mix escript.build
+$ ./animals
+```
 
 ## To Play Dogs
 Dogs is an append-node implementation of the solution
 
-* mix animals.dog
+```shell
+$mix animals.dog
+```
 
 ## Testing
 
